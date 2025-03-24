@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "mobile_movie_app",
-    "slug": "mobile_movie_app",
+    "slug": "mobile-movie-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "movies",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -36,6 +36,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "2e2ef64e-1669-4c05-80e4-07ab9d4fbe66"
+      }
+    },
+    "owner": "abdujalol"
   }
 }
