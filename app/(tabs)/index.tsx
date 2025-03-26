@@ -1,19 +1,22 @@
-import {Image, Text, View, ScrollView, ActivityIndicator} from "react-native";
+import {Image, Text, View, ScrollView, ActivityIndicator, FlatList} from "react-native";
 import {images} from "@/constants/images";
 import {icons} from "@/constants/icons";
 import SearchBar from "@/components/SearchBar";
 import {useRouter} from "expo-router";
 import {useFetch} from "@/hooks/useFetch"
 import {MovieService} from "@/services/movie.api"
+import {MovieCard} from "@/components/MovieCard";
+import {Movie} from "@/interfaces/interfaces";
 
 export default function Index() {
     const router = useRouter()
     const movieService = new MovieService()
     const {
-        data:movies,
+        data:moviesData,
         loading:moviesLoading,
         error:moviesError,
     }=useFetch(movieService.getMovies(""))
+
     return (
     <View className={"flex-1 bg-primary"}>
         <Image source={images.bg} className={"absolute w-full z-0"}/>
@@ -45,7 +48,24 @@ export default function Index() {
                                 />
                             </View>
                             <>
-                            <Text className={"text-white font-bold mt-5"}>LATEST MOVIES</Text>
+                                <Text className={"text-white mt-3 mb-3 font-bold"}>LATEST MOVIES</Text>
+                                <FlatList
+                                    data={moviesData}
+                                    renderItem={({item})=>(
+                                        <MovieCard movie={item as Movie}/>
+                                    )}
+                                    scrollEnabled={false}
+                                    keyExtractor={(item)=>item.id.toString()}
+                                    numColumns={3}
+                                    columnWrapperStyle={{
+                                        justifyContent:"flex-start",
+                                        paddingRight:5,
+                                        marginBottom:10,
+                                        gap:20,
+                                        width:"100%"
+                                    }}
+                                    className={"mt-2 pb-32 w-full"}
+                                />
                             </>
                         </View>
                     )
