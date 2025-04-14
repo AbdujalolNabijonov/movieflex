@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Movie, MovieDetails } from "@/interfaces/interfaces";
 
 export function useFetch(func: any) {
-  const [data, setData] = useState<Movie[] | MovieDetails>([]);
+  const [data, setData] = useState<Movie[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>();
   const [rebuild, setRebuild] = useState<Date>(new Date());
@@ -10,7 +10,7 @@ export function useFetch(func: any) {
   useEffect(() => {
     setLoading(true);
     func
-      .then((data: Movie[] | MovieDetails) => setData(data))
+      .then((data: Movie[]) => setData(data))
       .catch((err: any) => {
         setError(err);
       })
