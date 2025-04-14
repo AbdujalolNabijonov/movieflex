@@ -1,37 +1,52 @@
-import {Movie} from "@/interfaces/interfaces";
+import { Movie, MovieDetails, TrendingMovie } from "@/interfaces/interfaces";
 
-const TMDB_CONFIG={
-    BASE:"https://api.themoviedb.org/3",
-    HEADERS:{
-        accept:"application/json",
-        Authorization:`Bearer ${process.env.EXPO_PUBLIC_MOVIE_API_KEY}`,
-    }
-}
+const TMDB_CONFIG = {
+  BASE: "https://api.themoviedb.org/3",
+  HEADERS: {
+    accept: "application/json",
+    Authorization: `Bearer ${process.env.EXPO_PUBLIC_MOVIE_API_KEY}`,
+  },
+};
 
-export class MovieService{
-    serverApi
-    constructor() {
-        this.serverApi = TMDB_CONFIG.BASE
-    }
+export class MovieService {
+  serverApi;
+  constructor() {
+    this.serverApi = TMDB_CONFIG.BASE;
+  }
 
-    public async getMovies(query:string):Promise<Movie[]>{
-        try{
-            const endpoint = query?
-                `${this.serverApi}/search/movie?query=${encodeURIComponent(query)}`:
-                `${this.serverApi}/discover/movie?sort_by=popularity.desc`
-            const response = await fetch(endpoint,{
-                method: "GET",
-                headers:TMDB_CONFIG.HEADERS
-            })
-            if(!response.ok){
-                //@ts-ignore
-                throw new Error("Failed to get movies", response.statusText)
-            }
-            const data = await response.json()
-            return data.results
-        }catch (err:any){
-            console.error(err)
-            throw err
-        }
+  public async getMovies(query: string): Promise<Movie[]> {
+    try {
+      const endpoint = query
+        ? `${this.serverApi}/search/movie?query=${encodeURIComponent(query)}`
+        : `${this.serverApi}/discover/movie?sort_by=popularity.desc`;
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: TMDB_CONFIG.HEADERS,
+      });
+      if (!response.ok) {
+        //@ts-ignore
+        throw new Error("Failed to get movies", response.statusText);
+      }
+      const data = await response.json();
+      return data.results;
+    } catch (err: any) {
+      console.error(err);
+      throw err;
     }
+  }
+
+  public async getTargetMovie(movieId: string): Promise<MovieDetails> {
+    try {
+      const endpoint: string = `${this.serverApi}/movie/${movieId}`;
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: TMDB_CONFIG.HEADERS,
+      });
+      const data = await response.json();
+      return data;
+    } catch (err: any) {
+      console.log(`Error:getTargetMovie, ${err.message} `);
+      throw err;
+    }
+  }
 }

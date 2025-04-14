@@ -5,6 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
   FlatList,
+  ListRenderItemInfo,
 } from "react-native";
 import { images } from "@/constants/images";
 import { icons } from "@/constants/icons";
@@ -15,25 +16,36 @@ import { useFetch } from "@/hooks/useFetch";
 import { MovieService } from "@/services/movie.api";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
+import { AppWriteService } from "@/services/appwrite.server";
 
 function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const appWriteService = new AppWriteService();
   const movieService = new MovieService();
   const {
     data: moviesData,
     loading: moviesLoading,
     error: moviesError,
     refetch: moviesRefetch,
+    reset: reset,
   } = useFetch(movieService.getMovies(searchQuery));
 
   useEffect(() => {
-    if (searchQuery) {
-      setTimeout(() => {
-        moviesRefetch();
-      }, 500);
-    } else {
-    }
+    const timeoutId = setTimeout(async () => {
+      if (searchQuery) {
+        await moviesRefetch();
+
+        // Call updateSearchCount only if there are results
+        if (moviesData?.length > 0 && moviesData?.[0]) {
+          await appWriteService.updateSearchCount(searchQuery, moviesData[0]);
+        }
+      } else {
+        reset();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   }, [searchQuery]);
   return (
     <View className={"flex-1 bg-primary"}>
@@ -51,7 +63,9 @@ function Search() {
         <View>
           <FlatList
             data={moviesData}
-            renderItem={({ item }) => <MovieCard movie={item as Movie} />}
+            renderItem={({ item }: ListRenderItemInfo<Movie>) => (
+              <MovieCard movie={item} />
+            )}
             scrollEnabled={false}
             keyExtractor={(item) => item.id.toString()}
             numColumns={3}
